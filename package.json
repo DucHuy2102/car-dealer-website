@@ -9,9 +9,10 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@prisma/client": "^6.9.0",
+        "@prisma/client": "^6.10.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "csv": "^6.3.11",
         "lucide-react": "^0.513.0",
         "next": "15.3.3",
         "prisma": "^6.9.0",
@@ -26,10 +27,13 @@
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "tailwindcss": "^4",
+        "ts-node": "^10.9.2",
+        "tsconfig-paths": "^4.2.0",
         "tw-animate-css": "^1.3.4",
         "typescript": "^5"
     },
     "prisma": {
-        "schema": "./prisma/schema"
+        "schema": "./prisma/schema",
+        "seed": "ts-node -r tsconfig-paths/register --compiler-options {\"module\":\"CommonJS\"} ./prisma/seed/seed.ts"
     }
 }

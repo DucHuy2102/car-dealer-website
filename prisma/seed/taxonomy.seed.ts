@@ -207,14 +207,31 @@ export async function seedTaxonomy(prisma: PrismaClient) {
     *   ...
     * })
     */
+
     const allModels = await prisma.model.findMany({
         select: { id: true, name: true, make: { select: { name: true } } },
     });
+    /*
+     * allModels = [
+     *   { id: 101, name: '500', make: { name: 'ABARTH' } },
+     *   { id: 102, name: '595', make: { name: 'ABARTH' } },
+     *   { id: 103, name: 'Giulia', make: { name: 'ALFA ROMEO' } }
+     *   ...
+     *   ]
+     */
     const modelMap = new Map<string, number>();
     for (const model of allModels) {
         const key = `${model.make.name}-${model.name}`;
         modelMap.set(key, model.id);
     }
+    /*
+     *  Key (String)                    => Value (Number)
+     * ----------------------------------------------------
+     * 'ABARTH-500'                     => 101
+     * 'ABARTH-595'                     => 102
+     * 'ALFA ROMEO-Giulia'              => 103
+     * ...
+     */
     const variantPromises: Prisma.Prisma__ModelVariantClient<unknown, unknown>[] = [];
     for (const [makeName, models] of Object.entries(result)) {
         for (const [modelName, modelData] of Object.entries(models)) {

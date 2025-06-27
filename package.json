@@ -20,7 +20,8 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "slug": "^11.0.0",
-        "tailwind-merge": "^3.3.0"
+        "tailwind-merge": "^3.3.0",
+        "unlazy": "^0.12.4"
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",

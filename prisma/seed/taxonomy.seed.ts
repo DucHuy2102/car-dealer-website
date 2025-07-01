@@ -4,14 +4,14 @@ import fs from 'node:fs';
 
 /* 
     TODO: define the data structure for each row in the CSV file
-    * from { ABARTH,500,Turismo,2023,TRUE } become an object like:
-    * {
-    *   make: 'ABARTH',
-    *   model: '500',
-    *   variant: 'Turismo',
-    *   yearStart: 2023,
-    *   yearEnd: 2024
-    * }
+    - from { ABARTH,500,Turismo,2023,TRUE } become an object like:
+    - {
+    -   make: 'ABARTH',
+    -   model: '500',
+    -   variant: 'Turismo',
+    -   yearStart: 2023,
+    -   yearEnd: 2024
+    - }
  */
 type TRow = {
     make: string;
@@ -23,20 +23,20 @@ type TRow = {
 
 /* 
     TODO: transform flat array of rows into a nested structure:
-    * input: rows: TRow[]
-    * output: result: TMakeModel - group by Make → Model → Variants
-    * {
-    *   ABARTH: {
-    *       "500": {
-    *           variants: {
-    *               "Turismo": { yearStart: 2023, yearEnd: 2024 },
-    *               "Scorpionissima": { yearStart: 2023, yearEnd: 2024 }
-    *           }
-    *       },
-    *       "595": { ... }
-    *   },
-    *   TOYOTA: { ... }
-    * }
+    - input: rows: TRow[]
+    - output: result: TMakeModel - group by Make → Model → Variants
+    - {
+    -   ABARTH: {
+    -       "500": {
+    -           variants: {
+    -               "Turismo": { yearStart: 2023, yearEnd: 2024 },
+    -               "Scorpionissima": { yearStart: 2023, yearEnd: 2024 }
+    -           }
+    -       },
+    -       "595": { ... }
+    -   },
+    -   TOYOTA: { ... }
+    - }
 */
 type TMakeModel = {
     [make: string]: {
@@ -56,7 +56,7 @@ const BATCH_SIZE = 100;
 
 /* 
     TODO: helper function to split bulk insert into batches 
-    * purpose: avoid overloading db connection when inseting large datasets
+    --> purpose: avoid overloading db connection when inseting large datasets
 */
 async function insertInBatches<TUpsertArgs>(
     items: TUpsertArgs[],
@@ -72,16 +72,16 @@ async function insertInBatches<TUpsertArgs>(
 export async function seedTaxonomy(prisma: PrismaClient) {
     /* 
     TODO: parse csv file into an array of TRow
-    * input: cvs file
-    *   ABARTH,500,,2009,2015,FALSE
-    *   ABARTH,500,Turismo,2023,2024,FALSE
-    *   ...
-    * output: rows:TRow[]
-    *   [
-    *       { make: 'ABARTH', model: '500', variant: undefined, yearStart: 2009, yearEnd: 2015 },
-    *       { make: 'ABARTH', model: '500', variant: 'Turismo', yearStart: 2023, yearEnd: 2024 },
-    *       ...
-    *   ]
+    - input: cvs file
+    -   ABARTH,500,,2009,2015,FALSE
+    -   ABARTH,500,Turismo,2023,2024,FALSE
+    -   ...
+    - output: rows:TRow[]
+    -   [
+    -       { make: 'ABARTH', model: '500', variant: undefined, yearStart: 2009, yearEnd: 2015 },
+    -       { make: 'ABARTH', model: '500', variant: 'Turismo', yearStart: 2023, yearEnd: 2024 },
+    -       ...
+    -   ]
     */
     const rows = await new Promise<TRow[]>((resolve, reject) => {
         const eachRow: TRow[] = [];
@@ -128,14 +128,14 @@ export async function seedTaxonomy(prisma: PrismaClient) {
 
     /* 
     TODO: upsert Makes into DB (if exists → update image, else → create)
-    * input: result keys (make names)
-    * output: array of prisma promise upserts, ex:
-    * [
-    *   ...
-    *   prisma.make.upsert({ where: { name: 'ABARTH' }, ... }),
-    *   prisma.make.upsert({ where: { name: 'TOYOTA' }, ... }),
-    *   ...
-    * ]
+    - input: result keys (make names)
+    - output: array of prisma promise upserts, ex:
+    - [
+    -   ...
+    -   prisma.make.upsert({ where: { name: 'ABARTH' }, ... }),
+    -   prisma.make.upsert({ where: { name: 'TOYOTA' }, ... }),
+    -   ...
+    - ]
     */
     const imageURL = (name: string) =>
         `https://vl.imgix.net/img/${name
@@ -159,12 +159,12 @@ export async function seedTaxonomy(prisma: PrismaClient) {
 
     /* 
     TODO: prepare upsert promises for Models under each Make
-    * input: nested result[make.name]
-    * output:  array of Prisma Promise upserts, like:
-    * prisma.model.upsert({
-    *   where: { makeId_name: { name: '500', makeId: 'uuid' } },
-    *   ...
-    * })
+    - input: nested result[make.name]
+    - output:  array of Prisma Promise upserts, like:
+    - prisma.model.upsert({
+    -   where: { makeId_name: { name: '500', makeId: 'uuid' } },
+    -   ...
+    - })
     */
     const modelPromises: Prisma.Prisma__ModelClient<unknown, unknown>[] = [];
     for (const make of makes) {
@@ -200,24 +200,24 @@ export async function seedTaxonomy(prisma: PrismaClient) {
 
     /* 
     TODO: upsert Variants for each Model
-    * input: result[make][model].variants
-    * output: array of Prisma Promise upserts, like:
-    * prisma.modelVariant.upsert({
-    *   where: { modelId_name: { name: 'Turismo', modelId: 'uuid' } },
-    *   ...
-    * })
+    - input: result[make][model].variants
+    - output: array of Prisma Promise upserts, like:
+    - prisma.modelVariant.upsert({
+    -   where: { modelId_name: { name: 'Turismo', modelId: 'uuid' } },
+    -   ...
+    - })
     */
 
     const allModels = await prisma.model.findMany({
         select: { id: true, name: true, make: { select: { name: true } } },
     });
     /*
-     * allModels = [
-     *   { id: 101, name: '500', make: { name: 'ABARTH' } },
-     *   { id: 102, name: '595', make: { name: 'ABARTH' } },
-     *   { id: 103, name: 'Giulia', make: { name: 'ALFA ROMEO' } }
-     *   ...
-     *   ]
+     - allModels = [
+     -   { id: 101, name: '500', make: { name: 'ABARTH' } },
+     -   { id: 102, name: '595', make: { name: 'ABARTH' } },
+     -   { id: 103, name: 'Giulia', make: { name: 'ALFA ROMEO' } }
+     -   ...
+     -   ]
      */
     const modelMap = new Map<string, number>();
     for (const model of allModels) {
@@ -225,12 +225,12 @@ export async function seedTaxonomy(prisma: PrismaClient) {
         modelMap.set(key, model.id);
     }
     /*
-     *  Key (String)                    => Value (Number)
-     * ----------------------------------------------------
-     * 'ABARTH-500'                     => 101
-     * 'ABARTH-595'                     => 102
-     * 'ALFA ROMEO-Giulia'              => 103
-     * ...
+     -  Key (String)                    => Value (Number)
+     - ----------------------------------------------------
+     - 'ABARTH-500'                     => 101
+     - 'ABARTH-595'                     => 102
+     - 'ALFA ROMEO-Giulia'              => 103
+     - ...
      */
     const variantPromises: Prisma.Prisma__ModelVariantClient<unknown, unknown>[] = [];
     for (const [makeName, models] of Object.entries(result)) {

@@ -2,7 +2,14 @@
 
 import { routes } from '@/config/routes';
 import { ClassifiedWithImage, MultiStepFormEnum } from '@/config/types';
-import { Colour, FuelType, OdoUnit, Transmission } from '@prisma/client';
+import {
+    formatColour,
+    formatFuelType,
+    formatNumber,
+    formatOdoUnit,
+    formatPrice,
+    formatTransmission,
+} from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Cog, Fuel, GaugeCircle, Paintbrush2 } from 'lucide-react';
 import Image from 'next/image';
@@ -18,48 +25,12 @@ interface ClassifiedCardProps {
     favourites: number[];
 }
 
-const formatOdoReading = (num: number | null, option?: Intl.NumberFormatOptions) => {
-    if (num === null) return '0';
-    return new Intl.NumberFormat('en-GB', option).format(num);
-};
-
-const formatOdoUnit = (unit: OdoUnit) => {
-    return unit === OdoUnit.MILES ? 'mi' : 'km';
-};
-
-const formatTransmission = (transmission: Transmission) => {
-    return transmission === Transmission.AUTOMATIC ? 'Automatic' : 'Manual';
-};
-
-const formatFuelType = (fuelType: FuelType) => {
-    switch (fuelType) {
-        case FuelType.PETROL:
-            return 'Petrol';
-        case FuelType.DIESEL:
-            return 'Diesel';
-        case FuelType.ELECTRIC:
-            return 'Electric';
-        case FuelType.HYBRID:
-            return 'Hybrid';
-        default:
-            return 'Unknown';
-    }
-};
-
-const formatColour = (colour: Colour) => {
-    if (!colour) return 'Unknown';
-    const formattedColour = colour.charAt(0).toUpperCase() + colour.slice(1).toLowerCase();
-    return formattedColour;
-};
-
 const getKeyClassifiedInfo = (classified: ClassifiedWithImage) => {
     return [
         {
             id: 'odoReading',
             icon: <GaugeCircle className='w-4 h-4' />,
-            value: `${formatOdoReading(classified.odoReading)} ${formatOdoUnit(
-                classified.odoUnit
-            )}`,
+            value: `${formatNumber(classified.odoReading)} ${formatOdoUnit(classified.odoUnit)}`,
         },
         {
             id: 'transmission',
@@ -120,7 +91,10 @@ export default function ClassifiedCard(props: ClassifiedCardProps) {
                     text-slate-50 font-bold px-2 py-1 rounded-sm'
                         >
                             <p className='text-xs lg:text-base xl:text-lg font-semibold'>
-                                {classified.price}
+                                {formatPrice({
+                                    price: classified.price,
+                                    currency: classified.currency,
+                                })}
                             </p>
                         </div>
                     </div>

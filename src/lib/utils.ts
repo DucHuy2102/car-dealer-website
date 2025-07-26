@@ -1,3 +1,4 @@
+import { routes } from '@/config/routes';
 import {
     BodyType,
     Colour,
@@ -87,3 +88,8 @@ export const formatBody = (bodyType: BodyType) => {
             return 'Unknown';
     }
 };
+
+export const navLinks = [
+    { id: 1, href: routes.home, label: 'Home' },
+    { id: 2, href: routes.inventory, label: 'Inventory' },
+];

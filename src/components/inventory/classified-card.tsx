@@ -76,7 +76,7 @@ export default function ClassifiedCard(props: ClassifiedCardProps) {
                                 src={classified.images[0]?.src}
                                 alt={classified.images[0]?.alt || 'Car Image'}
                                 blurDataURL={classified.images[0]?.blurhash}
-                                className='object-cover'
+                                className='object-cover rounded-t-md'
                                 fill
                                 quality={25}
                             />

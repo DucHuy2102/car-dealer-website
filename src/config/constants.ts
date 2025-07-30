@@ -3,4 +3,4 @@ export const imageSources = {
         'https://car-dealer-website.s3.eu-west-1.amazonaws.com/next-s3-uploads/stock/classified-placeholder.jpeg',
 };
 
-export const CLASSIFIEDS_PER_PAGE = 10;
+export const CLASSIFIEDS_PER_PAGE = 3;

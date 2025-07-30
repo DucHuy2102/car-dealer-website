@@ -42,7 +42,7 @@ export default async function PublicHeader() {
                 <Link href={routes.favourites}>
                     <div
                         className='flex group-hover:bg-red-500 duration-200 transition-colors ease-in-out
-                        items-center justify-center w-10 h-10 bg-muted rounded-full'
+                        items-center justify-center w-10 h-10 bg-muted rounded-full border border-primary group-hover:border-none'
                     >
                         <HeartIcon className='w-6 h-6 text-primary group-hover:text-white group-hover:fill-white' />
                     </div>
